@@ -8,7 +8,7 @@ import { UserRejectedRequestError as UserRejectedRequestErrorWalletConnect } fro
 import { UserRejectedRequestError as UserRejectedRequestErrorFrame } from '@web3-react/frame-connector'
 import { Web3Provider } from '@ethersproject/providers'
 import { formatEther } from '@ethersproject/units'
-
+import { Biconomy} from '../components/testBiconomy.js'
 import { useEagerConnect, useInactiveListener } from '../hooks'
 import {
   injected,
@@ -255,6 +255,7 @@ function App() {
     <>
       <Header />
       <hr style={{ margin: '2rem' }} />
+      <Biconomy />
       <div
         style={{
           display: 'grid',
