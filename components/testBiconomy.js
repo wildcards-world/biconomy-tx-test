@@ -13,6 +13,8 @@ import { toBuffer } from "ethereumjs-util";
 import abi from "ethereumjs-abi";
 import events from "events";
 
+import Biconomy from "@biconomy/mexa";
+
 /******
  * HELPER CODE
  */
@@ -61,7 +63,7 @@ const executeMetaTransaciton = async (
   ) {
     // let nonce = 0;
     let nonce = await contract.methods.getNonce(userAddress).call();
-    console.log("The nonce is:", nonce);
+    // console.log("The nonce is:", nonce);
     let messageToSign = constructMetaTransactionMessage(
       nonce,
       chainId,
@@ -69,9 +71,9 @@ const executeMetaTransaciton = async (
       contractAddress
     );
 
-    console.log("web3", web3);
-    console.log("web3.eth", web3.eth);
-    console.log("web3.eth.personal", web3.eth.personal);
+    // console.log("web3", web3);
+    // console.log("web3.eth", web3.eth);
+    // console.log("web3.eth.personal", web3.eth.personal);
 
     // const signature = await web3.eth.sign(
     const signature = await web3.eth.personal.sign(
@@ -79,10 +81,36 @@ const executeMetaTransaciton = async (
       userAddress
     );
 
-    console.info(`User signature is ${signature}`);
+    // console.info(`User signature is ${signature}`);
     let { r, s, v } = getSignatureParameters(signature);
 
-    console.log("before transaction listener");
+    try {
+      fetch(`https://api.biconomy.io/api/v2/meta-tx/native`, {
+        method: "POST",
+        headers: {
+          "x-api-key": "IUNMuYhZ7.9c178f07-e191-4877-b995-ef4b61ed956f",
+          "Content-Type": "application/json;charset=utf-8",
+        },
+        body: JSON.stringify({
+          to: contractAddress,
+          apiId: "e0dd72a6-78e0-44f8-b56e-902c1b519ffa",
+          params: [userAddress, functionSignature, r, s, v],
+          // params: [userAddress, functionData, r, s, v],
+          from: userAddress,
+        }),
+      })
+        .then((response) => response.json())
+        .then(function (result) {
+          console.log(result);
+          console.log(`Transaction sent by relayer with hash ${result.txHash}`);
+        })
+        .catch(function (error) {
+          console.log(error);
+        });
+    } catch (error) {
+      console.log(error);
+    }
+
     // No need to calculate gas limit or gas price here
     let transactionListener = contract.methods
       .executeMetaTransaction(userAddress, functionSignature, r, s, v)
@@ -112,7 +140,7 @@ const executeMetaTransaciton = async (
  * HELPER CODE -end
  */
 
-export const Biconomy = () => {
+export const BiconomyComponent = () => {
   const context = useWeb3React();
   const {
     connector,
@@ -125,28 +153,27 @@ export const Biconomy = () => {
     error,
   } = context;
 
-  console.log({ library });
   if (!library) return <h2>Loading</h2>;
 
-  console.log("account", account);
-  Contract.setProvider(library.provider);
   web3 = new Web3(library.provider);
   const contractAddress = "0x59b3c176c39bd8734717492f4da8fe26ff6a454d";
 
-  var contract = new Contract(jsonInterface.abi, contractAddress);
-  // console.log("the library", {library});
-  // let web3 = new Web3(library);
-  // console.log("web3", {web3})
-  // Web3EthContract.setProvider(web3);
+  const biconomy = new Biconomy(library.provider, {
+    apiKey: "IUNMuYhZ7.9c178f07-e191-4877-b995-ef4b61ed956f",
+    debug: true,
+  });
 
-  console.log({ cmethods: contract.methods });
+  const web3Biconomy = new Web3(biconomy);
+  var contract = new web3Biconomy.eth.Contract(
+    jsonInterface.abi,
+    contractAddress
+  );
 
   const sendTransaction = async () => {
-    console.log("execute biconomy tx");
     let functionSignature = contract.methods
       .testFunctionThatDoesNothing(account)
       .encodeABI();
-    console.log("VERY IMPORTANT RESULT", functionSignature);
+
     // let result = contract.methods.testFunctionThatDoesNothing(account).send({
     //   from: account,
     // });
@@ -156,21 +183,21 @@ export const Biconomy = () => {
       contract,
       contractAddress,
       "4",
-      web3
+      web3Biconomy
     );
 
-    result
-      .on("transactionHash", (hash) => {
-        // On transacion Hash
-        console.log("hash", { hash });
-      })
-      .once("confirmation", (confirmation, recipet) => {
-        console.log("confirmation", { confirmation, recipet });
-        // On Confirmation
-      })
-      .on("error", (error) => {
-        // On Error
-      });
+    // result
+    //   .on("transactionHash", (hash) => {
+    //     // On transacion Hash
+    //     console.log("hash", { hash });
+    //   })
+    //   .once("confirmation", (confirmation, recipet) => {
+    //     console.log("confirmation", { confirmation, recipet });
+    //     // On Confirmation
+    //   })
+    //   .on("error", (error) => {
+    //     // On Error
+    //   });
   };
 
   return <button onClick={sendTransaction}>Send Tx</button>;

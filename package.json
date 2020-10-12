@@ -5,6 +5,7 @@
     "build": "next build && next export"
   },
   "dependencies": {
+    "@biconomy/mexa": "^1.5.13",
     "@ethersproject/providers": "^5.0.2",
     "@ethersproject/units": "^5.0.1",
     "@web3-react/abstract-connector": "latest",
@@ -29,7 +30,7 @@
     "react": "^16.12.0",
     "react-dom": "^16.12.0",
     "typescript": "^3.7.5",
-    "web3": "^1.3.0",
+    "web3": "1.2.5-rc.0",
     "web3-eth-contract": "^1.3.0"
   }
 }
