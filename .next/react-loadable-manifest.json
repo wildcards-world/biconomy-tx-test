@@ -13,10 +13,6 @@
   ],
   "@toruslabs/torus-embed": [
     {
-      "id": "./node_modules/@babel/runtime/helpers/arrayLikeToArray.js",
-      "file": "static/chunks/6.js"
-    },
-    {
       "id": "./node_modules/@babel/runtime/helpers/arrayWithoutHoles.js",
       "file": "static/chunks/6.js"
     },
@@ -78,10 +74,6 @@
     },
     {
       "id": "./node_modules/@babel/runtime/helpers/typeof.js",
-      "file": "static/chunks/6.js"
-    },
-    {
-      "id": "./node_modules/@babel/runtime/helpers/unsupportedIterableToArray.js",
       "file": "static/chunks/6.js"
     },
     {
@@ -623,7 +615,7 @@
       "file": "static/chunks/3.js"
     },
     {
-      "id": 20,
+      "id": 12,
       "file": "static/chunks/3.js"
     },
     {
@@ -693,7 +685,7 @@
       "file": "static/chunks/2.js"
     },
     {
-      "id": 23,
+      "id": 15,
       "file": "static/chunks/2.js"
     },
     {
@@ -853,7 +845,7 @@
       "file": "static/chunks/2.js"
     },
     {
-      "id": 22,
+      "id": 14,
       "file": "static/chunks/2.js"
     },
     {
@@ -1309,7 +1301,7 @@
       "file": "static/chunks/2.js"
     },
     {
-      "id": 24,
+      "id": 16,
       "file": "static/chunks/2.js"
     }
   ],
@@ -2191,7 +2183,7 @@
       "file": "static/chunks/1.js"
     },
     {
-      "id": 21,
+      "id": 13,
       "file": "static/chunks/1.js"
     },
     {

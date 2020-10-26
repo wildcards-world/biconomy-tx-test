@@ -1,4 +1,4 @@
-import React from "react";
+import React, {useState} from "react";
 import {
   Web3ReactProvider,
   useWeb3React,
@@ -15,7 +15,8 @@ import events from "events";
 
 import Biconomy from "@biconomy/mexa";
 
-const { signDaiPermit } = require("eth-permit");
+const { signDaiPermit } = require("./dist/eth-permit");
+// const { signDaiPermit } = require("eth-permit");
 
 /******
  * HELPER CODE
@@ -154,63 +155,154 @@ export const BiconomyComponent = () => {
     active,
     error,
   } = context;
+  let [hasSent, setHasSent] = useState(false);
 
   if (!library) return <h2>Loading</h2>;
   if (!account) return <h2>Loading</h2>;
-  console.log("Before sign")
-  signDaiPermit(
-    // library.provider,
-    window.ethereum,
-    "0x0099f841a6ab9a082828fac66134fd25c9d8a195",
-    account,
-    "0x89e2d4628435368a7CD72611E769dDe27802b95e",
-    ).then((result) => console.log("this is the result!", result));
-    console.log("Busy signing")
-    
-  web3 = new Web3(library.provider);
-  const contractAddress = "0x59b3c176c39bd8734717492f4da8fe26ff6a454d";
+  if (!hasSent) {
+    console.log("Before eth-permit - using this account:", account)
+  // signDaiPermit(
+  //   library.provider,
+  //   // window.ethereum,
+  //   "0x0099f841a6ab9a082828fac66134fd25c9d8a195",
+  //   account,
+  //   "0x89e2d4628435368a7CD72611E769dDe27802b95e",
+  //   ).then((result) => console.log("this is the result!", result));
 
-  const biconomy = new Biconomy(library.provider, {
-    apiKey: "IUNMuYhZ7.9c178f07-e191-4877-b995-ef4b61ed956f",
-    debug: true,
-  });
+  // const msgParams = [
+  //   {
+  //     type: 'string',      // Any valid solidity type
+  //     name: 'Message',     // Any string label you want
+  //     value: 'Hi, Alice!'  // The value to sign
+  // },
+  // {   
+  //   type: 'uint32',
+  //       name: 'A number',
+  //       value: '1337'
+  //   }
+  // ];
+  const newMessage = [
+    "0xd3Cbce59318B2E570883719c8165F9390A12BdD6",
+    {
+      "types": {
+        "EIP712Domain": [
+          {
+            "name": "name",
+            "type": "string"
+          },
+          {
+            "name": "version",
+            "type": "string"
+          },
+          {
+            "name": "chainId",
+            "type": "uint256"
+          },
+          {
+            "name": "verifyingContract",
+            "type": "address"
+          }
+        ],
+        "Permit": [
+          {
+            "name": "holder",
+            "type": "address"
+          },
+          {
+            "name": "spender",
+            "type": "address"
+          },
+          {
+            "name": "nonce",
+            "type": "uint256"
+          },
+          {
+            "name": "expiry",
+            "type": "uint256"
+          },
+          {
+            "name": "allowed",
+            "type": "bool"
+          }
+        ]
+      },
+      "primaryType": "Permit",
+      "domain": {
+        "name": "Dai Stablecoin",
+        "version": "1",
+        "chainId": "0x05",
+        "verifyingContract": "0x0099f841a6ab9a082828fac66134fd25c9d8a195"
+      },
+      "message": {
+        "holder": "0xd3Cbce59318B2E570883719c8165F9390A12BdD6",
+        "spender": "0x89e2d4628435368a7CD72611E769dDe27802b95e",
+        "nonce": "0x0000000000000000000000000000000000000000000000000000000000000000",
+        "expiry": "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+        "allowed": true
+      }
+    }
+  ];
+//   "from": "0xd3Cbce59318B2E570883719c8165F9390A12BdD6",
+//   "jsonrpc": "2.0"
+// };
 
-  const web3Biconomy = new Web3(biconomy);
-  var contract = new web3Biconomy.eth.Contract(
-    jsonInterface.abi,
-    contractAddress
-  );
+web3.currentProvider.sendAsync({
+  method: 'eth_signTypedData',
+  params: [newMessage, account],
+  // params: [msgParams, account],
+  from: account,
+}, function (err, result) {
+  console.log({err, result})
+})
+setHasSent(true);
+console.log("Busy signing")
+}
 
-  const sendTransaction = async () => {
-    let functionSignature = contract.methods
-      .testFunctionThatDoesNothing(account)
-      .encodeABI();
+return <p>doing magic</p>;
+  // web3 = new Web3(library.provider);
+  // const contractAddress = "0x59b3c176c39bd8734717492f4da8fe26ff6a454d";
 
-    // let result = contract.methods.testFunctionThatDoesNothing(account).send({
-    //   from: account,
-    // });
-    let result = await executeMetaTransaciton(
-      account,
-      functionSignature,
-      contract,
-      contractAddress,
-      "4",
-      web3Biconomy
-    );
+  // const biconomy = new Biconomy(library.provider, {
+  //   apiKey: "IUNMuYhZ7.9c178f07-e191-4877-b995-ef4b61ed956f",
+  //   debug: true,
+  // });
 
-    // result
-    //   .on("transactionHash", (hash) => {
-    //     // On transacion Hash
-    //     console.log("hash", { hash });
-    //   })
-    //   .once("confirmation", (confirmation, recipet) => {
-    //     console.log("confirmation", { confirmation, recipet });
-    //     // On Confirmation
-    //   })
-    //   .on("error", (error) => {
-    //     // On Error
-    //   });
-  };
+  // const web3Biconomy = new Web3(biconomy);
+  // var contract = new web3Biconomy.eth.Contract(
+  //   jsonInterface.abi,
+  //   contractAddress
+  // );
 
-  return <button onClick={sendTransaction}>Send Tx</button>;
+  // const sendTransaction = async () => {
+  //   let functionSignature = contract.methods
+  //     .testFunctionThatDoesNothing(account)
+  //     .encodeABI();
+
+  //   // let result = contract.methods.testFunctionThatDoesNothing(account).send({
+  //   //   from: account,
+  //   // });
+  //   let result = await executeMetaTransaciton(
+  //     account,
+  //     functionSignature,
+  //     contract,
+  //     contractAddress,
+  //     "4",
+  //     web3Biconomy
+  //   );
+
+  //   // result
+  //   //   .on("transactionHash", (hash) => {
+  //   //     // On transacion Hash
+  //   //     console.log("hash", { hash });
+  //   //   })
+  //   //   .once("confirmation", (confirmation, recipet) => {
+  //   //     console.log("confirmation", { confirmation, recipet });
+  //   //     // On Confirmation
+  //   //   })
+  //   //   .on("error", (error) => {
+  //   //     // On Error
+  //   //   });
+  // };
+
+  // return <button onClick={sendTransaction}>Send Tx</button>;
 };
