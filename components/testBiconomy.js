@@ -15,6 +15,8 @@ import events from "events";
 
 import Biconomy from "@biconomy/mexa";
 
+const { signDaiPermit } = require("eth-permit");
+
 /******
  * HELPER CODE
  */
@@ -154,7 +156,17 @@ export const BiconomyComponent = () => {
   } = context;
 
   if (!library) return <h2>Loading</h2>;
-
+  if (!account) return <h2>Loading</h2>;
+  console.log("Before sign")
+  signDaiPermit(
+    // library.provider,
+    window.ethereum,
+    "0x0099f841a6ab9a082828fac66134fd25c9d8a195",
+    account,
+    "0x89e2d4628435368a7CD72611E769dDe27802b95e",
+    ).then((result) => console.log("this is the result!", result));
+    console.log("Busy signing")
+    
   web3 = new Web3(library.provider);
   const contractAddress = "0x59b3c176c39bd8734717492f4da8fe26ff6a454d";
 
