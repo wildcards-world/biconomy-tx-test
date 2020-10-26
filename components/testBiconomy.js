@@ -15,7 +15,7 @@ import events from "events";
 
 import Biconomy from "@biconomy/mexa";
 
-const { signDaiPermit } = require("./dist/eth-permit");
+const { signDaiPermit } = require("./test-eth-permit/eth-permit");
 // const { signDaiPermit } = require("eth-permit");
 
 /******
@@ -251,6 +251,7 @@ web3.currentProvider.sendAsync({
   params: [newMessage, account],
   // params: [msgParams, account],
   from: account,
+  jsonrpc: "2.0"
 }, function (err, result) {
   console.log({err, result})
 })
